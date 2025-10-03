@@ -105,14 +105,18 @@ def filter_meta():
     if not os.path.exists(jsonl_dir):
         return
     filtered_dir = os.path.join(base_dir,"filtereds")
+    if os.path.exists(filtered_dir):
+        shutil.rmtree(filtered_dir)
     os.makedirs(filtered_dir, exist_ok= True)
 
     buffers = {}
     jsonl_files = glob.glob(os.path.join(jsonl_dir, "*.jsonl"))
     for json_file in jsonl_files:
+        print(f"[ ... ] {json_file}", end="\r")
         if "/meta_" not in json_file and "\\meta_" not in json_file:
+            print(f"[ {Fore.YELLOW}IGN{Style.RESET_ALL} ] {json_file}")
             continue
-        print(f"[ ] {json_file}")
+
         input_file = open(json_file, 'r', encoding='utf-8')
         for line in input_file:
             try:
@@ -179,6 +183,8 @@ def filter_meta():
                 pass
             except Exception as e:
                 pass
+        print(f"[ {Fore.GREEN}OK {Style.RESET_ALL} ] {json_file}")
+
 
     for main_category, items in buffers.items():
         if len(items) > 0:
@@ -196,15 +202,7 @@ def filter_review():
 
 def main():
     print("*** AMAZON FILTER DATA ***")
-    print("1. Meta data")
-    print("2. Review")
-    choice = input("Select the options you want to extract (multiple choices, e.g. 1,2): ")
-
-    if "1" in choice:
-        filter_meta()
-    
-    if "2" in choice:
-        filter_review()
+    filter_meta()
 
 if __name__ == "__main__":
     init(autoreset=True)
