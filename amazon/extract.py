@@ -45,8 +45,8 @@ def to_sqlite(output_file_path, buffers):
         conn = sqlite3.connect(output_file_path)
         cursor = conn.cursor()
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS Products (
-                item_id TEXT PRIMARY KEY,
+            CREATE TABLE IF NOT EXISTS products (
+                item_id INTEGER PRIMARY KEY AUTOINCREMENT,
                 title TEXT NOT NULL,
                 main_category TEXT NOT NULL,
                 features TEXT NOT NULL,
@@ -63,8 +63,8 @@ def to_sqlite(output_file_path, buffers):
     cursor = conn.cursor()
     cursor.executemany(
         "INSERT INTO products "\
-        "(item_id, title, main_category, features, description, price, rating, image) "\
-        "VALUES (:item_id, :title, :main_category, :features, :description, :price, :rating, :image)", 
+        "(title, main_category, features, description, price, rating, image) "\
+        "VALUES (:title, :main_category, :features, :description, :price, :rating, :image)", 
         buffers)
     conn.commit()
     conn.close()
@@ -134,9 +134,9 @@ def main():
     jsonl_files = glob.glob(os.path.join(input_dir, "*.jsonl"))
     for json_file in jsonl_files:
         buffers = []
-        print(f"[ .. ] {json_file}", end="\r")
+        print(f"[ {Fore.LIGHTCYAN_EX}>>{Style.RESET_ALL} ] {json_file}", end="\r")
         if "/meta_" not in json_file and "\\meta_" not in json_file:
-            print(f"[ {Fore.YELLOW}IG{Style.RESET_ALL} ] {json_file}")
+            print(f"[ {Fore.LIGHTYELLOW_EX}IG{Style.RESET_ALL} ] {json_file}")
             continue
 
         input_file = open(json_file, 'r', encoding='utf-8')
@@ -150,7 +150,7 @@ def main():
                 pass
         
         if len(buffers) < limit_min_line:
-            print(f"[ {Fore.YELLOW}IG{Style.RESET_ALL} ] {json_file}")
+            print(f"[ {Fore.LIGHTYELLOW_EX}IG{Style.RESET_ALL} ] {json_file}")
         else:
             if target_file.endswith(".db"):
                 to_sqlite(output_file_path, buffers)
@@ -158,10 +158,10 @@ def main():
                 to_jsonl(output_file_path, buffers)
             elif target_file.endswith(".csv"):
                 to_csv(output_file_path, buffers)
-            print(f"[ {Fore.GREEN}OK{Style.RESET_ALL} ] {json_file}")
+            print(f"[ {Fore.LIGHTGREEN_EX}OK{Style.RESET_ALL} ] {json_file}")
         pass
 
-    print(f"{Fore.GREEN}Extract to {output_file_path} succeeded!{Style.RESET_ALL}")
+    print(f"{Fore.LIGHTGREEN_EX}Extract to {output_file_path} succeeded!{Style.RESET_ALL}")
     pass
 
 
